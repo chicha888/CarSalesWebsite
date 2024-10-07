@@ -1,0 +1,122 @@
+﻿@using CarSalesWebsite.ViewModels
+@model UserDetailVM
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<h2>Profile page</h2>
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center">
+                @if(Model.ProfileImageUrl == null)
+                {
+                    <img src="~/images/users/defaultUserPhoto.jpg" class="card-img-top img-fluid car-image" alt="Profile Image">
+                }
+                else
+                {
+                    <img src="@Model.ProfileImageUrl" class="card-img-top img-fluid car-image" alt="Profile Image">
+                }
+
+                <div class="card-body">
+                    <h4 class="card-title">@Model.FirstName @Model.LastName</h4>
+                    <p class="card-text text-muted">Member since: @Model.CreatedDate.ToString("MMMM yyyy")</p>
+                </div>
+                @if (User.Identity.IsAuthenticated && User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value == Model.Id)
+                {
+                    <form asp-action="UpdateProfileImage" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ProfileImageUrl" />
+                        <div class="form-group">
+                            <label asp-for="ProfileImage">Upload Profile Image</label>
+                            <input asp-for="ProfileImage" type="file" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Upload</button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>User Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> @Model.FirstName @Model.LastName</p>
+                    <p><strong>Phone number:</strong> @Model.PhoneNumber</p>
+                    <p><strong>Email:</strong> @Model.Email</p>
+                    <p><strong>Profile Created:</strong> @Model.CreatedDate.ToString("MMMM dd, yyyy")</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>User Cars</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Cars != null && Model.Cars.Count > 0)
+                    {
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                            @foreach (var car in Model.Cars)
+                            {
+                                <div class="card" style="width: 18rem;">
+                                    <img src="@car.CarImages.Where(x => x.IsPrimary).Select(x => x.ImageUrl).First()" class="card-img-top img-fluid car-image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@car.Make @car.Model</h5>
+                                        <p class="card-text truncated-text">@car.Description</p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Year: @car.Year</li>
+                                        <li class="list-group-item">Mileage: @car.Mileage km</li>
+                                        <li class="list-group-item">Price: @car.Price $</li>
+                                        <li class="list-group-item">
+                                            <strong>Status: </strong>
+                                            @if (car.IsSold)
+                                            {
+                                                <strong style="color: red">Sold</strong>
+                                            }
+                                            else
+                                            {
+                                                <strong style="color: limegreen">Available</strong>
+                                            }
+                                        </li>
+                                    </ul>
+                                    <div class="card-body">
+                                        <div class="btn-group" role="group" aria-label="First group">
+                                            <a asp-controller="Car" asp-action="Info" asp-route-id="@car.Id" type="button" class="btn btn-outline-secondary">Details</a>
+                                            @if (User.Identity.IsAuthenticated && car.User.Id == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value)
+                                            {
+                                                <a asp-controller="Car" asp-action="Edit" asp-route-id="@car.Id" type="button" class="btn btn-outline-secondary">Edit</a>
+                                                <form asp-action="Delete" asp-controller="Car" asp-route-id="@car.Id">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">This user has no cars listed.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .car-image {
+        height: 200px;
+        object-fit: fill;
+        object-position: center;
+    }
+</style>

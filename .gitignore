@@ -1,0 +1,22 @@
+# Ignore folder with user images and car images
+/wwwroot/images/cars/*
+/wwwroot/images/users/*
+
+# Ignore environment-specific appsettings files
+appsettings.Development.json
+appsettings.Production.json
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore user-specific files
+.vs/
+.vscode/
+*.swp
+*.user
+*.db
+*.log
+
+# Ignore sensitive config files
+secrets.json

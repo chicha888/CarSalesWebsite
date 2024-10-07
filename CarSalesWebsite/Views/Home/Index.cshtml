@@ -1,0 +1,84 @@
+﻿@using CarSalesWebsite.ViewModels
+@model List<CarInfoVM>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="d-grid gap-2 col-6 mx-auto">
+    <a type="button" class="btn btn-outline-success" asp-action="AddCar" asp-controller="Car">Sell a car</a>
+</div>
+
+<p></p>
+<h3>Car list</h3>
+
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            @foreach(var car in Model)
+            {
+                <div class="card" style="width: 18rem;">
+                    @if(car.PrimaryImage != null)
+                    {
+                        <img src="@car.PrimaryImage" class="card-img-top img-fluid car-image">
+                    }
+                    else
+                    {
+                        <img src="~/images/cars/defaultCarPhoto.jpg" class="card-img-top img-fluid car-image" alt="Car Image">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@car.Make @car.Model</h5>
+                        <p class="card-text truncated-text">@car.Description</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Year: @car.Year</li>
+                        <li class="list-group-item">Mileage: @car.Mileage km</li>
+                        <li class="list-group-item">Price: @car.Price $</li>
+                        <li class="list-group-item">
+                            <strong>Status: </strong> 
+                            @if (car.IsSold)
+                            {
+                                <strong style="color: red">Sold</strong>
+                            }
+                            else
+                            {
+                                <strong style="color: limegreen">Available</strong>
+                            }
+                        </li>
+                    </ul>
+                    <div class="card-body">
+                        <div class="btn-group" role="group" aria-label="First group">
+                            <a asp-controller="Car" asp-action="Info" asp-route-id="@car.Id" type="button" class="btn btn-outline-secondary">Details</a>
+                            @if (User.Identity.IsAuthenticated && car.User.Id == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value)
+                            {
+                                <a asp-controller="Car" asp-action="Edit" asp-route-id="@car.Id" type="button" class="btn btn-outline-secondary">Edit</a>
+                                <form asp-action="Delete" asp-controller="Car" asp-route-id="@car.Id">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .car-image {
+        height: 200px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .truncated-text {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 4.5em;
+    }
+
+</style>
